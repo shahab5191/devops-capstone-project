@@ -24,6 +24,8 @@ HTTPS_ENVIRON = {'wsgi.url_scheme': 'https'}
 ######################################################################
 #  T E S T   C A S E S
 ######################################################################
+
+
 class TestAccountService(TestCase):
     """Account Service Tests"""
 
@@ -136,7 +138,7 @@ class TestAccountService(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
         self.assertEqual(data["name"], account.name)
-    
+
     def test_account_not_found(self):
         resp = self.client.get(
             f"{BASE_URL}/0"
@@ -159,14 +161,14 @@ class TestAccountService(TestCase):
         resp = self.client.post(BASE_URL, json=test_account.serialize())
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
 
-        #update
+        # update
         new_account = resp.get_json()
         new_account["name"] = "shahab"
         resp = self.client.put(f"{BASE_URL}/{new_account['id']}", json=new_account)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         updated_account = resp.get_json()
         self.assertEqual(updated_account["name"], "shahab")
-    
+
     def test_update_not_found(self):
         """it should return 404 if account was not found"""
         resp = self.client.put(f"{BASE_URL}/0")
@@ -177,16 +179,17 @@ class TestAccountService(TestCase):
         test_account = self._create_accounts(1)[0]
         resp = self.client.delete(f"{BASE_URL}/{test_account.id}")
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
-    
+
     def test_delete_not_found(self):
         """it should return 404 if user with this id does not exists"""
         resp = self.client.delete(f"{BASE_URL}/0")
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
     def test_header_security(self):
         """it should return security headers"""
         response = self.client.get("/", environ_overrides=HTTPS_ENVIRON)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        headers= {
+        headers = {
             'X-Frame-Options': 'SAMEORIGIN',
             'X-XSS-Protection': '1; mode=block',
             'X-Content-Type-Options': 'nosniff',
